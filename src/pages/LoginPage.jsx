@@ -1,64 +1,60 @@
 import { useState } from "react";
-import chatbotLogo from "../assets/chatbot.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const DUMMY_USER = {
     email: "admin@admin.com",
     password: "admin",
-};
+}
 
-export default function LoginPage({ onLoginSuccess }) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+export default function LoginPage() {
+    const [error, setError] = useState("")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
 
+    const navigate = useNavigate()
+
+    // Kullanıcı girişi kontrol ediliyor
     const handleLogin = (e) => {
-        e.preventDefault();
-
+        e.preventDefault()
         if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
-            localStorage.setItem("isLoggedIn", "true");
-            navigate('/chatbot');
-        } else {
-            setError("E-posta veya şifre yanlış!");
+            localStorage.setItem("isLoggedIn", "true")
+            navigate('/chatbot')
+        }
+        else {
+            setError("E-posta veya Şifre yanlış")
         }
     }
 
     return (
-        <div className="min-h-screen flex flex-row">
-            <div className="w-1/2 flex items-center justify-center bg-gray-100 ">
+        <div className="flex flex-row border min-h-screen">
+            <div className="border-r flex w-1/2 items-center justify-center bg-gray-200">
                 <form
                     onSubmit={handleLogin}
-                    className="bg-white p-8 rounded-2xl shadow-md w-80 hover:scale-105 transition-all duration-300"
-                >
-                    <h2 className="text-2xl font-bold mb-6 text-center">Giriş Yap</h2>
+                    className="flex flex-col p-8 bg-white rounded-2xl shadow-md w-80 hover:scale-105 transition-all duration-300">
+                    <h2 className="text-center font-bold text-2xl mb-5">GİRİŞ YAP</h2>
                     <input
                         type="email"
                         placeholder="E-posta"
-                        value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="border p-2 w-full mb-3 "
-                    />
+                        className="mb-5 border p-2 w-full" />
                     <input
                         type="password"
                         placeholder="Şifre"
-                        value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="border p-2 w-full mb-3"
-                    />
-                    {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+                        className="mb-5 border p-2 w-full" />
+                    {
+                        error && <p className="text-red-500 text-center text-sm mb-2">{error}</p>
+                    }
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 w-full rounded"
-                    >
-                        Giriş Yap
+                        className="bg-blue-600 text-white px-4 py-2 w-full rounded cursor-pointer">
+                        Giriş yap
                     </button>
                 </form>
             </div>
-
-            <div className="w-1/2 flex items-center justify-center ">
-                <img src={chatbotLogo} alt="Logo" className="w-48" />
+            <div className="flex w-1/2 items-center justify-center">
+                <img src="./src/assets/chatbot.png" alt="ChatbotLogo" className="w-60" />
             </div>
-        </div >
-    );
+        </div>
+    )
 }

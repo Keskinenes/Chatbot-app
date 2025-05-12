@@ -1,16 +1,25 @@
-
-import React, { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router"
 import { CiLight, CiDark } from "react-icons/ci";
-import { useNavigate } from "react-router-dom";
 import { fetchMessages } from "../api";
 
-function App() {
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState("");
-    const [isDarkMode, setIsDarkMode] = useState(false);
+export default function ChatbotPage() {
+    const [messages, setMessages] = useState([])
+    const [isDarkMode, setIsDarkMode] = useState(false)
+    const [input, setInput] = useState("")
     const [allData, setAllData] = useState([]);
+
     const bottomRef = useRef(null);
-    const navigate = useNavigate();
+
+    const navigate = useNavigate()
+
+    // Oturum Kapatma 
+    const handleLogout = () => {
+        localStorage.removeItem("isLoggedIn")
+        navigate("/")
+    }
+
+    //Dark modu ekleme çıkarma
     useEffect(() => {
         const root = document.documentElement;
         if (isDarkMode) {
@@ -18,22 +27,23 @@ function App() {
         } else {
             root.classList.remove("dark");
         }
-    }, [isDarkMode]);
+    }, [isDarkMode])
 
+    // mesaj ekleyince en son mesaja gelicek scroll kaymayacak
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-    const handleLogout = () => {
-        localStorage.removeItem("isLoggedIn"); // Giriş bilgisi temizlenir
-        navigate("/"); // Login sayfasına yönlendirilir
-    };
+    }, [messages])
+
+    //Apiden çektiğimiz verileri tutuyoruz 
     useEffect(() => {
         const loadMessages = async () => {
             const data = await fetchMessages();
             setAllData(data);
         };
         loadMessages();
-    }, []);
+    }, [])
+
+    //Chatbot Soru ve cevap kısmı 
     const handleSend = (e) => {
         e.preventDefault();
         if (input.trim() === "") return;
@@ -61,13 +71,16 @@ function App() {
 
         const botMessageObj = { sender: "bot", text: botMessage };
         setMessages((prev) => [...prev, botMessageObj]);
-    };
+    }
+
+
+
+    //Ekrana önce botun mesajını bırakmak için id'si 1 olanı buluyoruz onu ekrana eklıyoruz
     useEffect(() => {
         if (allData.length > 0) {
-            const initialMessage = allData.find((msg) => msg.id === "1"); // id'si 1 olan mesajı buluyoruz
+            const initialMessage = allData.find((msg) => msg.id === "1");
             if (initialMessage) {
                 setMessages((prevMessages) => {
-                    // Eğer mesaj zaten eklenmişse, tekrar eklemiyoruz
                     if (!prevMessages.some((msg) => msg.id === initialMessage.id)) {
                         return [...prevMessages, initialMessage];
                     }
@@ -75,65 +88,61 @@ function App() {
                 });
             }
         }
-    }, [allData]); // allData değiştiğinde çalışacak
+    }, [allData])
+
     return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-300 dark:bg-gray-900 dark:border transition-colors">
-                <div className=" absolute top-1 right-2 ">
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-red-500 cursor-pointer text-white rounded hover:bg-red-600"
+        <div className="min-h-screen flex justify-center items-center bg-gray-200 dark:bg-gray-950">
+            <div className=" absolute top-1 right-2 ">
+                <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 cursor-pointer text-white rounded hover:bg-red-600"
+                >
+                    Çıkış Yap
+                </button>
+            </div>
+            <div className="border max-w-2xl w-full items-center bg-gray-300 rounded-lg shadow-lg dark:bg-gray-800" >
+                <div className="flex items-center justify-between mb-4 p-5">
+                    <h1 className="text-2xl font-bold dark:text-white">CHATBOT</h1>
+                    <button className="text-4xl cursor-pointer text-black dark:text-white"
+                        onClick={() => setIsDarkMode(!isDarkMode)}
                     >
-                        Çıkış Yap
+                        {isDarkMode ? <CiLight /> : <CiDark />}
                     </button>
                 </div>
-                <div className="border max-w-2xl w-full p-5 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-lg">
-                    <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-3xl font-bold text-center dark:text-white">CHATBOT</h1>
-                        <button
-                            onClick={() => setIsDarkMode(!isDarkMode)}
-                            className={`p-2 text-4xl rounded cursor-pointer ${isDarkMode ? "bg-transparent text-white" : "bg-transparent text-black"}`}
+                <div className="space-y-4 overflow-y-auto max-h-80 m-5">
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                         >
-                            {isDarkMode ? <CiLight /> : <CiDark />}
-                        </button>
-                    </div>
-
-                    <div className="space-y-4 overflow-y-auto max-h-80 mb-4">
-                        {messages.map((msg, index) => (
                             <div
-                                key={index}
-                                className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                                className={`px-4 py-2 rounded-lg max-w-full break-words ${msg.sender === "user"
+                                    ? "bg-neutral-900 text-white dark:bg-gray-600"
+                                    : "bg-gray-100 dark:bg-gray-300 dark:text-black"
+                                    }`}
                             >
-                                <div
-                                    className={`px-4 py-2 rounded-lg max-w-full break-words ${msg.sender === "user"
-                                        ? "bg-neutral-900 text-white dark:bg-gray-600"
-                                        : "bg-gray-100 dark:bg-gray-300 dark:text-black"
-                                        }`}
-                                >
-                                    {msg.text}
-                                </div>
+                                {msg.text}
                             </div>
-                        ))}
-                        <div ref={bottomRef} />
-                    </div>
-
-                    <form onSubmit={handleSend} className="flex items-center">
-                        <textarea
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            className="w-full p-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-black dark:text-white resize-none break-words"
-                            placeholder="Mesajınızı yazın..."
-                        />
-                        <button
-                            type="submit"
-                            className="ml-2 p-2 w-[200px] cursor-pointer bg-neutral-900 text-white dark:bg-gray-600 rounded-lg"
-                        >
-                            Gönder
-                        </button>
-
-                    </form>
+                        </div>
+                    ))}
+                    <div ref={bottomRef} />
                 </div>
+
+                <form onSubmit={handleSend} className="flex items-center">
+                    <textarea
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        className="p-2 w-full resize-none break-words bg-gray-200 m-5 rounded-xl dark:bg-gray-400"
+                        placeholder="Mesajınızı yazın...."
+                    />
+                    <button
+                        type="submit"
+                        className="mr-2 p-2 w-[200px] cursor-pointer bg-gray-600 text-white dark:bg-gray-600 rounded-lg"
+                    >
+                        Gönder
+                    </button>
+                </form>
             </div>
+        </div>
     );
 }
-
-export default App;
