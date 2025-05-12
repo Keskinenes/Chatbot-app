@@ -3,10 +3,10 @@
 Bu proje, kullanıcıların chatbot ile etkileşime girebileceği basit bir React uygulamasıdır. Uygulama, kullanıcıdan gelen mesajlara yanıt olarak, önceden belirlenmiş mesajları API üzerinden çekerek cevaplar sunmaktadır.
 
 ### Görsel Eklemek:
-<img src="./src/assets/chatbot1.PNG" width="80%"/>
-<img src="./src/assets/chatbot2.PNG" width="80%"/>
-<img src="./src/assets/chatbot3.PNG" width="80%"/>
-<img src="./src/assets/chatbot4.PNG" width="80%"/>
+  <img src="./src/assets/chatbot1.PNG" width="60%" />
+  <img src="./src/assets/chatbot2.PNG" width="60%" />
+  <img src="./src/assets/chatbot3.PNG" width="60%" />
+  <img src="./src/assets/chatbot4.PNG" width="60%" />
 
 
 
